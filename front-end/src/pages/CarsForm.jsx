@@ -17,6 +17,8 @@ import ptLocale from 'date-fns/locale/pt-BR'
 import { parseISO } from 'date-fns'
 import { FormControlLabel, Switch } from '@mui/material'
 import InputAdornment from '@mui/material/InputAdornment'
+import Car from '../models/car'
+import { ZodError } from 'zod'
 
 export default function CarForm() {
 
@@ -137,6 +139,7 @@ export default function CarForm() {
     event.preventDefault(false)   // Evita o recarregamento da página
   
     try {
+      Car.parse(car)
       let result 
       // se id então put para atualizar
       if(car.id) result = await myfetch.put(`car/${car.id}`, car)
@@ -152,14 +155,36 @@ export default function CarForm() {
       })  
     }
     catch(error) {
-      setState({ ...state, 
+      if(error instanceof ZodError) {
+        console.error(error)
+
+        // Preenchendo os estado validationError
+        // para exibir os erros para o usuário
+        let valErrors = {}
+        for(let e of error.issues) valErrors[e.path[0]] = e.message
+
+        setState({
+          ...state,
+          validationErrors: valErrors,
+          showWaiting: false, // Esconde o backdrop
+          notification: {
+            show: true,
+            severity: 'error',
+            message: 'ERRO: há campos inválidos no formulário.'
+          }
+        })
+        
+      }
+
+      else setState({ ...state, 
         showWaiting: false, // Esconde o backdrop
         notification: {
           show: true,
           severity: 'error',
-          message: 'ERRO: ' + error.message
+          message: 'ERRO: ' + error.message,
+          validationErrors: {}
         } 
-      })  
+      })     
     }
   }
 

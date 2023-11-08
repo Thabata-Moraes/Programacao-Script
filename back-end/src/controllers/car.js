@@ -1,9 +1,14 @@
 import prisma from '../database/client.js'
+import Car from '../models/car.js'
+
 
 const controller = {}     // Objeto vazio
 
 controller.create = async function(req, res) {
   try {
+
+    Car.parse(req.body)
+
     await prisma.car.create({ data: req.body })
 
     // HTTP 201: Created
@@ -11,6 +16,8 @@ controller.create = async function(req, res) {
   }
   catch(error) {
     console.error(error)
+    if(error instanceof ZodError) res.status(422).send(error.issues)
+
     // HTTP 500: Internal Server Error
     res.status(500).send(error)
   }
