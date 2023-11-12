@@ -32,7 +32,7 @@ export default function CarForm() {
     year_manufacture: '',
     imported: false,
     plates: '',
-    selling_price: '',
+    selling_price: undefined,
     customer_id: ''
   }
 
@@ -46,7 +46,8 @@ export default function CarForm() {
       message: ''
     },
     openDialog: false,
-    isFormModified: false
+    isFormModified: false,
+    validationErrors: {}
   })
 
   const {
@@ -55,7 +56,8 @@ export default function CarForm() {
     showWaiting,
     notification,
     openDialog,
-    isFormModified
+    isFormModified,
+    validationErrors
   } = state
   
   const maskFormChars = {
@@ -123,6 +125,10 @@ export default function CarForm() {
     
     if (event.target.name === 'imported'){
       newCar[event.target.name] = event.target.checked
+    } else if (event.target.name === 'selling_price'){
+      console.log(event.target.valueAsNumber)
+      newCar[event.target.name] = event.target.valueAsNumber
+
     } else {
       newCar[event.target.name] = event.target.value
     }
@@ -150,7 +156,8 @@ export default function CarForm() {
         notification: {
           show: true,
           severity: 'success',
-          message: 'Dados salvos com sucesso.'
+          message: 'Dados salvos com sucesso.',
+          validationErrors: {}
         }  
       })  
     }
@@ -258,6 +265,8 @@ export default function CarForm() {
             required
             fullWidth
             value={car.brand}
+            error={validationErrors?.brand}
+            helperText={validationErrors?.brand}
             onChange={handleFieldChange}
             autoFocus
           />
@@ -271,6 +280,8 @@ export default function CarForm() {
             fullWidth
             placeholder="Ex.: Rua Principal"
             value={car.model}
+            error={validationErrors?.model}
+            helperText={validationErrors?.model}
             onChange={handleFieldChange}
           />
 
@@ -282,6 +293,8 @@ export default function CarForm() {
             required
             fullWidth
             value={car.color}
+            error={validationErrors?.color}
+            helperText={validationErrors?.color}
             onChange={handleFieldChange}
           />
 
@@ -293,8 +306,9 @@ export default function CarForm() {
             defaultValue=""
             fullWidth
             variant="filled"
-            helperText="Selecione o ano"
             value={car.year_manufacture}
+            error={validationErrors?.year_manufacture}
+            helperText={validationErrors?.year_manufacture}
             onChange={handleFieldChange}
           >
             {years.map((option) => (
@@ -314,6 +328,8 @@ export default function CarForm() {
             name="imported" 
             labelPlacement="start" 
             checked={car.imported}
+            error={validationErrors?.imported}
+            helperText={validationErrors?.imported}
           />
 
           <InputMask
@@ -332,6 +348,8 @@ export default function CarForm() {
                 variant="filled"
                 required
                 fullWidth
+                error={validationErrors?.plates}
+                helperText={validationErrors?.plates}
                 inputProps={{style: {textTransform: 'uppercase'}}}
               />
             }
@@ -348,6 +366,8 @@ export default function CarForm() {
               startAdornment: <InputAdornment position="start">R$</InputAdornment>
             }}         
             value={car.selling_price}
+            error={validationErrors?.selling_price}
+            helperText={validationErrors?.selling_price}
             onChange={handleFieldChange}
           />
 
@@ -355,10 +375,16 @@ export default function CarForm() {
             <DatePicker
               label="Data de venda"
               value={car.selling_date}
+              
               onChange={ value => 
                 handleFieldChange({ target: { name: 'selling_date', value } }) 
               }
-              slotProps={{ textField: { variant: 'filled', fullWidth: true } }}
+              slotProps={{ textField: { 
+                variant: 'filled', 
+                fullWidth: true,
+                error: validationErrors?.selling_date,
+                helperText: validationErrors?.selling_date
+              }}}
             />
           </LocalizationProvider>
 

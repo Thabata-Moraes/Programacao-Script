@@ -7,6 +7,7 @@ const minYearManufacture = new Date()
 minYearManufacture.setFullYear(maxYearManufacture.getFullYear() - 83)
 
 const maxSellingDate = new Date()
+maxSellingDate.setFullYear(maxYearManufacture.getFullYear())
 
 const Car = z.object({
   brand: 
@@ -45,7 +46,7 @@ const Car = z.object({
 
   selling_price:
     z.number()
-    .max(2000, {message: 'O valor não pode ser abaixo de 2000'})
+    .min(2000, {message: 'O valor não pode ser abaixo de 2000'})
     .nullable(),
 
   customer_id:
@@ -55,5 +56,3 @@ const Car = z.object({
 })
 
 export default Car
-
-// selling_date e "selling_price"
